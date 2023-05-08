@@ -9,7 +9,6 @@ function injectHTML(list) {
   const target = document.querySelector('#breach_list');
   target.innerHTML = '';
   list.forEach((item) => {
-    item.isVerified = true;
     const str = `<li>${item.Name}: ${item.Description}</li>`;
     target.innerHTML += str;
   });
@@ -41,9 +40,9 @@ function initChart(chart, object){
     data: {
       labels: labels,
       datasets: [{
-        label: 'Breaches By Category',
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
+        label: 'Number of Users affected',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
         data: info
       }]
     },
@@ -71,11 +70,12 @@ function changeChart(chart, object){
 }
 
 async function getData(){
-  const url ='https://haveibeenpwned.com/api/v2/breaches';
+  const url ='https://haveibeenpwned.com/api/v3/breaches';
   const data = await fetch(url);
   const json = await data.json();
-  const reply = json.filter((item) => Boolean(item.isVerified=true)).filter((item) => Boolean(item.Name));
-  return reply;
+  // const reply = json.filter((item) => Boolean(item.isVerified)).filter((item) => Boolean(item.Name));
+  const verifiedBreaches = json.filter(breach => breach.IsVerified);
+  return verifiedBreaches;
 }
 
 function shapeDataForChart(array){
@@ -115,6 +115,7 @@ async function mainEvent() {
 
   //let storedList = [];
   let currentList = []; // this is "scoped" to the main event function
+  let storedList2 = [];
 
   /* We need to listen to an "event" to have something happen in our page - here we're listening for a "submit" */
 
@@ -128,19 +129,21 @@ async function mainEvent() {
     loadAnimation.style.display = 'inline-block';
 
     // Basic GET request - this replaces the form Action
-    const results = await fetch('https://haveibeenpwned.com/api/v2/breaches');
+    const results = await fetch('https://haveibeenpwned.com/api/v3/breaches');
 
 
     const storedList = await results.json();
-    localStorage.setItem('storedData',JSON.stringify(storedList));
-    parsedData = storedList;
+    const verifiedBreaches = storedList.filter(breach => breach.IsVerified);
+    storedList2 = verifiedBreaches;
+    localStorage.setItem('storedData',JSON.stringify(storedList2));
+    parsedData = storedList2;
     if (parsedData?.length>0){
       generateListButton.classList.remove("hidden");
     }
     loadAnimation.style.display = 'none';
-    console.table(storedList);
-    injectHTML(storedList);
-    const localData = shapeDataForChart(storedList);
+    console.table(storedList2);
+    injectHTML(storedList2);
+    const localData = shapeDataForChart(storedList2);
     changeChart(myChart, localData);
     
   });
@@ -182,30 +185,30 @@ async function mainEvent() {
 
 }
 
-function initMap (){
-  const carto = L.map('map').setView([38.9897, -76.9378], 13);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(carto);
-return carto;                   
-}
+// function initMap (){
+//   const carto = L.map('map').setView([38.9897, -76.9378], 13);
+//   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     maxZoom: 19,
+//     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// }).addTo(carto);
+// return carto;                   
+// }
 
-function markerPlace (array, map) {
-console.log('array for markers', array);
+// function markerPlace (array, map) {
+// console.log('array for markers', array);
 
-map.eachLayer((layer) => {
-  if (layer instanceof L.Marker) {
-    layer.remove();
-  }
-});
+// map.eachLayer((layer) => {
+//   if (layer instanceof L.Marker) {
+//     layer.remove();
+//   }
+// });
 
-array.forEach((item) => {
-console.log('markerPlace', item);
-const {coordinates} = item.geocoded_column_1;
-L.marker([coordinates[1], coordinates[0]]).addTo(map);
-})
-}
+// array.forEach((item) => {
+// console.log('markerPlace', item);
+// const {coordinates} = item.geocoded_column_1;
+// L.marker([coordinates[1], coordinates[0]]).addTo(map);
+// })
+// }
 
 /*
   This adds an event listener that fires our main event only once our page elements have loaded

@@ -183,11 +183,6 @@ form {
     And will be what displays in your client
   */
 
-  #map {
-    width: 400px;
-    height: 360px;
-    margin-bottom: 1rem;
-  }
 
 .box {
   background-color: rgba(239, 239, 239, 0.4);
@@ -371,7 +366,7 @@ form label {
   }
 
 
-  .right_section {
+  .breach_box {
     flex: 1 1 auto;
     justify-content: start;
   }
