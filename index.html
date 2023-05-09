@@ -3,7 +3,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Apollo Cybersecurity Solutions</title>
+    <title>Cybersecurity Awareness</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
@@ -29,20 +29,41 @@
             action="https://haveibeenpwned.com/api/v3/breaches"
             class="box main_form"
           >
-            <label for="resto">Sort by breach name</label>
+            <label for="breach">Search by breach name</label>
             <input type="text" name="breach" id="breach" />
             <button type="button" id="generate" class ="hidden">Generate List</button>
             <div class="buttons">
               <button type="button" id="data_load">Load Breaches</button>
               <button type="button" id="data_clear">Clear Breaches</button>
             </div>
-          </form> 
+          </form>
+                      <!-- <menu class='menu'>
+              <li class='dropdown'><span>Sort ▾</span></li>
+              <li><a href='#'>Most affected to Least Affected (Descending)</a></li>
+              <li><a href='#'>Least Affected to Most Affected(Ascending)</a></li>
+            </menu> -->
+          
+            <!-- <li class='dropdown'><span>Sort ▾</span></li>
+            <select id="sort-dropdown"> 
+              <option value="asc">Sort Ascending</option>
+              <option value="desc">Sort Descending</option>
+            </select> -->
 
           <div class="chart_container">
+            <div class = "sorter">
+            <label for="sort-breaches">Sort breaches by: </label>
+            <select id="sort-breaches">
+              <option value="sort" selected>....</option>
+              <option value="asc">Most Users Affected</option>
+              <option value="desc">Least Users Affected</option>
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
             <canvas id="myChart"></canvas>
           </div>
           <ol class="box" id="breach_list">
-            A list of cybersecurity breaches
+            A list of prominent cybersecurity breaches
           </ol>
           <div class="lds-ellipsis" id="load_animation">
             <div></div>

@@ -24,7 +24,7 @@ function filterList(list, query) {
 
 function processRestaurants(list) {
   console.log('fired list of breaches');
-  const range = [...Array(15).keys()];
+  const range = [...Array(20).keys()];
   return newArray = range.map((item) => {
     const index = getRandomIntInclusive(0, list.length - 1);
     return list[index]
@@ -33,25 +33,23 @@ function processRestaurants(list) {
 
 function initChart(chart, object){
   const labels = Object.keys(object);
-  const info = Object.keys(object).map((item)=> object[item].PwnCount);
+  const info = labels.map((item) => object[item][0].PwnCount);
+
 
   return new Chart(chart, {
     type: 'bar',
     data: {
+      axis: 'y',
       labels: labels,
       datasets: [{
         label: 'Number of Users affected',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgb(255, 99, 132)',
+        borderColor: 'rgb(255, 99, 132)',
         data: info
       }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      indexAxis: 'y',
     }
   });
 
@@ -59,7 +57,7 @@ function initChart(chart, object){
 
 function changeChart(chart, object){
   const labels = Object.keys(object);
-  const info = Object.keys(object).map((item)=> object[item].PwnCount);
+  const info = labels.map((item) => object[item][0].PwnCount);
 
   chart.data.labels = labels;
   chart.data.datasets.forEach((dataset) => {
@@ -78,13 +76,6 @@ async function getData(){
 }
 
 function shapeDataForChart(array){
-  // return array.reduce((collection, item)=>{
-  //   if(!collection[item.category]){
-  //     collection[item.category] = [item]
-  //   } else{
-  //     collection[item.category].push(item);
-  //   }
-  //   return collection;
   return array.reduce((collection, breach) => {
     if (!collection[breach.Name]) {
       collection[breach.Name] = [breach];
@@ -96,6 +87,25 @@ function shapeDataForChart(array){
 
 }
 
+function sortDataByPwnCount(data, sortDirection) {
+  return data.sort((a, b) => {
+    if (sortDirection === 'asc') {
+      return a.PwnCount - b.PwnCount;
+    } else {
+      return b.PwnCount - a.PwnCount;
+    }
+  });
+}
+
+function BreachTime(breaches) {
+  const sortedBreaches = [...breaches].sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
+  const mostRecentBreach = sortedBreaches[0];
+  const oldestBreach = sortedBreaches[sortedBreaches.length - 1];
+  return {
+    mostRecent: mostRecentBreach,
+    oldest: oldestBreach
+  };
+}
 
 async function mainEvent() {
   // const filterButton = document.querySelector('#filter_button');// Add a querySelector that targets your filter button here
@@ -107,6 +117,7 @@ async function mainEvent() {
   loadAnimation.style.display = 'none';
   generateListButton.classList.add('hidden');
   const textField = document.querySelector('#breach');
+  const sortDropdown = document.querySelector('#sort-breaches');
 
   // const carto = initMap();
 
@@ -124,29 +135,12 @@ async function mainEvent() {
   let currentList = []; // this is "scoped" to the main event function
   let storedList2 = [];
 
-  // const dataForChart = parsedData.reduce((col, item, idx) =>{
-  //   if (!col[item.Name]){
-  //     col[item.Name] = 1
-  //   }
-  //   else {
-  //     col[item.Name] += 1
-  //   }
-  //   return col;
-  // }, {})
+  loadDataButton.addEventListener('click', async (submitEvent) => { 
 
-  // console.log (dataForChart);
-  // console.log (shapeDataForChart);
-  /* We need to listen to an "event" to have something happen in our page - here we're listening for a "submit" */
-
-  loadDataButton.addEventListener('click', async (submitEvent) => { // async has to be declared on every function that needs to "await" something
-
-    // This prevents your page from becoming a list of 1000 records from the county, even if your form still has an action set on it
     submitEvent.preventDefault();
-
     // this is substituting for a "breakpoint" - it prints to the browser to tell us we successfully submitted the form
     console.log('loading data...');
     loadAnimation.style.display = 'inline-block';
-
     // Basic GET request - this replaces the form Action
     const results = await fetch('https://haveibeenpwned.com/api/v3/breaches');
 
@@ -167,16 +161,6 @@ async function mainEvent() {
 
   });
 
-  /**filterButton.addEventListener('click', (event) => {
-    console.log('Clicked FilterButton');
-    const formData = new FormData(mainForm);
-    const formProps = Object.fromEntries(formData);
-    console.log(formProps);
-    const newList = filterList(currentList, formProps.resto);
-    console.log(newList);
-    injectHTML(newList);
-  })**/
-
   generateListButton.addEventListener('click', (event) => {
     console.log('generate new list');
     currentList = processRestaurants(chartData);
@@ -184,6 +168,14 @@ async function mainEvent() {
     injectHTML(currentList);
     const localData = shapeDataForChart(currentList);
     changeChart(myChart, localData);
+  });
+
+  let sortedData = sortDataByPwnCount(chartData, 'desc');
+  sortDropdown.addEventListener('change', (event) => {
+    let sortOrder = event.target.value;
+    console.log(sortOrder);
+    sortedData = sortDataByPwnCount(chartData, sortOrder);
+    changeChart(myChart, sortedData);
   });
 
   textField.addEventListener('input', (event) => {
@@ -201,32 +193,8 @@ async function mainEvent() {
     console.log('localStorage Check', localStorage.getItem("storedData"));
   });
 
+
 }
-
-// function initMap (){
-//   const carto = L.map('map').setView([38.9897, -76.9378], 13);
-//   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//     maxZoom: 19,
-//     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-// }).addTo(carto);
-// return carto;
-// }
-
-// function markerPlace (array, map) {
-// console.log('array for markers', array);
-
-// map.eachLayer((layer) => {
-//   if (layer instanceof L.Marker) {
-//     layer.remove();
-//   }
-// });
-
-// array.forEach((item) => {
-// console.log('markerPlace', item);
-// const {coordinates} = item.geocoded_column_1;
-// L.marker([coordinates[1], coordinates[0]]).addTo(map);
-// })
-// }
 
 /*
   This adds an event listener that fires our main event only once our page elements have loaded
