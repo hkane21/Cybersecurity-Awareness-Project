@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Apollo Cybersecurity Solutions</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <div class="wrapper">
@@ -23,33 +22,11 @@
         </nav>
       </header>
       <div class = "container">
-        <div class="breach_box">
-          <h2>Data Breach Aggregator</h2>
-          <form
-            action="https://haveibeenpwned.com/api/v3/breaches"
-            class="box main_form"
-          >
-            <label for="resto">Sort by breach name</label>
-            <input type="text" name="breach" id="breach" />
-            <button type="button" id="generate" class ="hidden">Generate List</button>
-            <div class="buttons">
-              <button type="button" id="data_load">Load Breaches</button>
-              <button type="button" id="data_clear">Clear Breaches</button>
-            </div>
-          </form> 
-
-          <div class="chart_container">
-            <canvas id="myChart"></canvas>
-          </div>
-          <ol class="box" id="breach_list">
-            A list of cybersecurity breaches
-          </ol>
-          <div class="lds-ellipsis" id="load_animation">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
+        <div class="about_box">
+          <h2>About Us</h2>
+          This website was designed to provide information about some of the most prominent data breaches of the last decade 
+          including their causes, effects, and prevention strategies. 
+          This would help users learn about cybersecurity and the steps they can take to protect themselves from future breaches.
 
         </div>
       </div>

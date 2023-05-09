@@ -9,21 +9,21 @@ function injectHTML(list) {
   const target = document.querySelector('#breach_list');
   target.innerHTML = '';
   list.forEach((item) => {
-    const str = `<li>${item.Name}: ${item.Description}</li>`;
+    const str = `<li>${item.Name.bold()}: ${item.Description}</li>`;
     target.innerHTML += str;
   });
 }
 
 function filterList(list, query) {
   return list.filter((item) => {
-    const LCaseName = item.name.toLowerCase();
+    const LCaseName = item.Name.toLowerCase();
     const LCaseQuery = query.toLowerCase();
     return LCaseName.includes(LCaseQuery);
   })
 }
 
 function processRestaurants(list) {
-  console.log('fired breach list');
+  console.log('fired list of breaches');
   const range = [...Array(15).keys()];
   return newArray = range.map((item) => {
     const index = getRandomIntInclusive(0, list.length - 1);
@@ -33,8 +33,8 @@ function processRestaurants(list) {
 
 function initChart(chart, object){
   const labels = Object.keys(object);
-  const info = Object.keys(object).map((item)=> object[item].length);
-  
+  const info = Object.keys(object).map((item)=> object[item].PwnCount);
+
   return new Chart(chart, {
     type: 'bar',
     data: {
@@ -59,7 +59,7 @@ function initChart(chart, object){
 
 function changeChart(chart, object){
   const labels = Object.keys(object);
-  const info = Object.keys(object).map((item)=> object[item].length);
+  const info = Object.keys(object).map((item)=> object[item].PwnCount);
 
   chart.data.labels = labels;
   chart.data.datasets.forEach((dataset) => {
@@ -73,23 +73,31 @@ async function getData(){
   const url ='https://haveibeenpwned.com/api/v3/breaches';
   const data = await fetch(url);
   const json = await data.json();
-  // const reply = json.filter((item) => Boolean(item.isVerified)).filter((item) => Boolean(item.Name));
-  const verifiedBreaches = json.filter(breach => breach.IsVerified);
-  return verifiedBreaches;
+  const reply = json.filter((item) => Boolean(item.IsVerified)).filter((item) => Boolean(item.Name));
+  return reply;
 }
 
 function shapeDataForChart(array){
-  return array.reduce((collection, item)=>{
-    if(!collection[item.category]){
-      collection[item.category] = [item]
-    } else{
-      collection[item.category].push(item);
+  // return array.reduce((collection, item)=>{
+  //   if(!collection[item.category]){
+  //     collection[item.category] = [item]
+  //   } else{
+  //     collection[item.category].push(item);
+  //   }
+  //   return collection;
+  return array.reduce((collection, breach) => {
+    if (!collection[breach.Name]) {
+      collection[breach.Name] = [breach];
+    }else{
+    collection[breach.Name].push(breach);
     }
     return collection;
   }, {});
+
 }
 
-async function mainEvent() { 
+
+async function mainEvent() {
   // const filterButton = document.querySelector('#filter_button');// Add a querySelector that targets your filter button here
   const loadDataButton = document.querySelector('#data_load');// Add a querySelector that targets your load county data button here
   const clearDataButton = document.querySelector('#data_clear');// Add a querySelector that clears your load county data button here
@@ -99,7 +107,7 @@ async function mainEvent() {
   loadAnimation.style.display = 'none';
   generateListButton.classList.add('hidden');
   const textField = document.querySelector('#breach');
- 
+
   // const carto = initMap();
 
   const chartData = await getData();
@@ -113,10 +121,21 @@ async function mainEvent() {
     generateListButton.classList.remove('hidden');
   }
 
-  //let storedList = [];
   let currentList = []; // this is "scoped" to the main event function
   let storedList2 = [];
 
+  // const dataForChart = parsedData.reduce((col, item, idx) =>{
+  //   if (!col[item.Name]){
+  //     col[item.Name] = 1
+  //   }
+  //   else {
+  //     col[item.Name] += 1
+  //   }
+  //   return col;
+  // }, {})
+
+  // console.log (dataForChart);
+  // console.log (shapeDataForChart);
   /* We need to listen to an "event" to have something happen in our page - here we're listening for a "submit" */
 
   loadDataButton.addEventListener('click', async (submitEvent) => { // async has to be declared on every function that needs to "await" something
@@ -145,7 +164,7 @@ async function mainEvent() {
     injectHTML(storedList2);
     const localData = shapeDataForChart(storedList2);
     changeChart(myChart, localData);
-    
+
   });
 
   /**filterButton.addEventListener('click', (event) => {
@@ -163,7 +182,6 @@ async function mainEvent() {
     currentList = processRestaurants(chartData);
     console.log(currentList);
     injectHTML(currentList);
-    // markerPlace(currentList, carto);
     const localData = shapeDataForChart(currentList);
     changeChart(myChart, localData);
   });
@@ -191,7 +209,7 @@ async function mainEvent() {
 //     maxZoom: 19,
 //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 // }).addTo(carto);
-// return carto;                   
+// return carto;
 // }
 
 // function markerPlace (array, map) {
