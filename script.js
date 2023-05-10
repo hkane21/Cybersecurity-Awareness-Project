@@ -33,10 +33,14 @@ function RandomizeList(list) {
 
 function sortDataForChart(data, sortOption) {
   const sortedData = Object.entries(data).sort((a, b) => {
-    if (sortOption === "pwncount") {
+    if (sortOption === "asc") {
       return b[1][0].PwnCount - a[1][0].PwnCount;
-    } else if (sortOption === "breachdate") {
+    } else if (sortOption === "desc") {
+      return a[1][0].PwnCount - b[1][0].PwnCount;
+    } else if (sortOption === "recent") {
       return new Date(b[1][0].BreachDate) - new Date(a[1][0].BreachDate);
+    } else if (sortOption === "oldest") {
+      return new Date(a[1][0].BreachDate) - new Date(b[1][0].BreachDate);
     }
   });
   return sortedData.reduce((obj, [key, val]) => {
@@ -128,10 +132,7 @@ async function mainEvent() {
   console.log(shapedData);
   const myChart = initChart(chartTarget, shapedData);
 
-  sortDropdown.addEventListener("change", (event) => {
-    sortOption = event.target.value;
-    changeChart(myChart, shapedData, sortOption);
-  });
+
 
   const storedData = localStorage.getItem('storedData');
   let parsedData = JSON.parse(storedData);
@@ -141,6 +142,7 @@ async function mainEvent() {
 
   let currentList = []; // this is "scoped" to the main event function
   let storedList2 = [];
+  let selectedData;
 
   refreshButton.addEventListener('click', async (submitEvent) => { 
 
@@ -167,14 +169,22 @@ async function mainEvent() {
 
   });
 
+  
   generateListButton.addEventListener('click', (event) => {
     console.log('generate new list');
     currentList = RandomizeList(chartData);
     console.log(currentList);
     injectHTML(currentList);
-    const localData = shapeDataForChart(currentList);
-    changeChart(myChart, localData);
+    selectedData = shapeDataForChart(currentList);
+    console.log(selectedData);
+    changeChart(myChart, selectedData);
   });
+
+  sortDropdown.addEventListener("change", (event) => {
+    sortOption = event.target.value;
+    // injectHTML(sortDataForChart(selectedData));
+    changeChart(myChart, selectedData, sortOption);
+  });  
 
   textField.addEventListener('input', (event) => {
     console.log('input', event.target.value);
@@ -184,6 +194,7 @@ async function mainEvent() {
     const localData = shapeDataForChart(newList);
     changeChart(myChart, localData);
   });
+
 
   refreshButton.addEventListener('click', (event)=>{
     console.log('clear browser data');
