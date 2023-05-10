@@ -22,7 +22,7 @@ function filterList(list, query) {
   })
 }
 
-function processRestaurants(list) {
+function RandomizeList(list) {
   console.log('fired list of breaches');
   const range = [...Array(20).keys()];
   return newArray = range.map((item) => {
@@ -31,9 +31,26 @@ function processRestaurants(list) {
   });
 }
 
-function initChart(chart, object){
-  const labels = Object.keys(object);
-  const info = labels.map((item) => object[item][0].PwnCount);
+function sortDataForChart(data, sortOption) {
+  const sortedData = Object.entries(data).sort((a, b) => {
+    if (sortOption === "pwncount") {
+      return b[1][0].PwnCount - a[1][0].PwnCount;
+    } else if (sortOption === "breachdate") {
+      return new Date(b[1][0].BreachDate) - new Date(a[1][0].BreachDate);
+    }
+  });
+  return sortedData.reduce((obj, [key, val]) => {
+    obj[key] = val;
+    return obj;
+  }, {});
+}
+
+function initChart(chart, object, sortOption){
+    // const labels = Object.keys(object);
+  // const info = labels.map((item) => object[item][0].PwnCount);
+  const sortedData = sortDataForChart(object, sortOption);
+  const labels = Object.keys(sortedData);
+  const info = labels.map((item) => sortedData[item][0].PwnCount);
 
 
   return new Chart(chart, {
@@ -55,9 +72,12 @@ function initChart(chart, object){
 
 }
 
-function changeChart(chart, object){
-  const labels = Object.keys(object);
-  const info = labels.map((item) => object[item][0].PwnCount);
+function changeChart(chart, object, sortOption){
+  // const labels = Object.keys(object);
+  // const info = labels.map((item) => object[item][0].PwnCount);
+  const sortedData = sortDataForChart(object, sortOption);
+  const labels = Object.keys(sortedData);
+  const info = labels.map((item) => sortedData[item][0].PwnCount);
 
   chart.data.labels = labels;
   chart.data.datasets.forEach((dataset) => {
@@ -87,29 +107,12 @@ function shapeDataForChart(array){
 
 }
 
-function sortDataByPwnCount(data, sortDirection) {
-  return data.sort((a, b) => {
-    if (sortDirection === 'asc') {
-      return a.PwnCount - b.PwnCount;
-    } else {
-      return b.PwnCount - a.PwnCount;
-    }
-  });
-}
 
-function RecentOldBreach (breaches) {
-  const sortedBreaches = [...breaches].sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
-  const mostRecentBreach = sortedBreaches[0];
-  const oldestBreach = sortedBreaches[sortedBreaches.length - 1];
-  return {
-    mostRecent: mostRecentBreach,
-    oldest: oldestBreach
-  };
-}
 
 async function mainEvent() {
-  const loadDataButton = document.querySelector('#data_load'); 
-  const clearDataButton = document.querySelector('#data_clear');
+  // const loadDataButton = document.querySelector('#data_load'); 
+  // const clearDataButton = document.querySelector('#data_clear');
+  const refreshButton = document.querySelector('#data_refresh');
   const generateListButton = document.querySelector('#generate');
   const chartTarget = document.querySelector('#myChart');
   const loadAnimation = document.querySelector('#load_animation');
@@ -118,10 +121,17 @@ async function mainEvent() {
   const textField = document.querySelector('#breach');
   const sortDropdown = document.querySelector('#sort-breaches');
 
+  let sortOption = "pwncount";
+
   const chartData = await getData();
   const shapedData = shapeDataForChart(chartData);
   console.log(shapedData);
   const myChart = initChart(chartTarget, shapedData);
+
+  sortDropdown.addEventListener("change", (event) => {
+    sortOption = event.target.value;
+    changeChart(myChart, shapedData, sortOption);
+  });
 
   const storedData = localStorage.getItem('storedData');
   let parsedData = JSON.parse(storedData);
@@ -132,7 +142,7 @@ async function mainEvent() {
   let currentList = []; // this is "scoped" to the main event function
   let storedList2 = [];
 
-  loadDataButton.addEventListener('click', async (submitEvent) => { 
+  refreshButton.addEventListener('click', async (submitEvent) => { 
 
     submitEvent.preventDefault();
     // this is substituting for a "breakpoint" - it prints to the browser to tell us we successfully submitted the form
@@ -159,19 +169,11 @@ async function mainEvent() {
 
   generateListButton.addEventListener('click', (event) => {
     console.log('generate new list');
-    currentList = processRestaurants(chartData);
+    currentList = RandomizeList(chartData);
     console.log(currentList);
     injectHTML(currentList);
     const localData = shapeDataForChart(currentList);
     changeChart(myChart, localData);
-  });
-
-  let sortedData = sortDataByPwnCount(chartData, 'desc');
-  sortDropdown.addEventListener('change', (event) => {
-    let sortOrder = event.target.value;
-    console.log(sortOrder);
-    sortedData = sortDataByPwnCount(chartData, sortOrder);
-    changeChart(myChart, sortedData);
   });
 
   textField.addEventListener('input', (event) => {
@@ -183,7 +185,7 @@ async function mainEvent() {
     changeChart(myChart, localData);
   });
 
-  clearDataButton.addEventListener('click', (event)=>{
+  refreshButton.addEventListener('click', (event)=>{
     console.log('clear browser data');
     localStorage.clear();
     console.log('localStorage Check', localStorage.getItem("storedData"));

@@ -30,15 +30,16 @@
           >
             <label for="breach">Search by breach name</label>
             <input type="text" name="breach" id="breach" />
-            <button type="button" id="generate" class ="hidden">Generate List</button>
             <div class="buttons">
-              <button type="button" id="data_load">Load Breaches</button>
-              <button type="button" id="data_clear">Clear Breaches</button>
+              <!-- <button type="button" id="data_load">Load Breaches</button>
+              <button type="button" id="data_clear">Clear Breaches</button> -->
+              <button type="button" id="data_refresh">Refresh Data</button>
+              <button type="button" id="generate" class ="hidden">Generate List</button>
             </div>
           </form>
           <div class="chart_container">
             <div class = "sorter">
-            <label for="sort-breaches">Sort breaches by: </label>
+            <label for="sort">Sort breaches by: </label>
             <select id="sort-breaches">
               <option value="sort" selected>....</option>
               <option value="asc">Most Users Affected</option>
