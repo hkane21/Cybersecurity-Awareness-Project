@@ -49,6 +49,20 @@ function sortDataForChart(data, sortOption) {
   }, {});
 }
 
+function sortBreaches(list, sortOption) {
+  let sortedList = [];
+  if (sortOption === "asc") {
+    sortedList = list.sort((a, b) => a.PwnCount - b.PwnCount);
+  } else if (sortOption === "desc") {
+    sortedList = list.sort((a, b) => b.PwnCount - a.PwnCount);
+  } else if (sortOption === "oldest") {
+    sortedList = list.sort((a, b) => new Date(a.BreachDate) - new Date(b.BreachDate));
+  } else if (sortOption === "recent") {
+    sortedList = list.sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
+  }
+  return sortedList;
+}
+
 function initChart(chart, object, sortOption){
     // const labels = Object.keys(object);
   // const info = labels.map((item) => object[item][0].PwnCount);
@@ -183,6 +197,8 @@ async function mainEvent() {
   sortDropdown.addEventListener("change", (event) => {
     sortOption = event.target.value;
     // injectHTML(sortDataForChart(selectedData));
+    const sortedData = sortBreaches(currentList, event.target.value);
+    injectHTML(sortedData);
     changeChart(myChart, selectedData, sortOption);
   });  
 
