@@ -97,7 +97,7 @@ function sortDataByPwnCount(data, sortDirection) {
   });
 }
 
-function BreachTime(breaches) {
+function RecentOldBreach (breaches) {
   const sortedBreaches = [...breaches].sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
   const mostRecentBreach = sortedBreaches[0];
   const oldestBreach = sortedBreaches[sortedBreaches.length - 1];
@@ -108,18 +108,15 @@ function BreachTime(breaches) {
 }
 
 async function mainEvent() {
-  // const filterButton = document.querySelector('#filter_button');// Add a querySelector that targets your filter button here
-  const loadDataButton = document.querySelector('#data_load');// Add a querySelector that targets your load county data button here
-  const clearDataButton = document.querySelector('#data_clear');// Add a querySelector that clears your load county data button here
-  const generateListButton = document.querySelector('#generate');// Add a querySelector that targets your generate button here
+  const loadDataButton = document.querySelector('#data_load'); 
+  const clearDataButton = document.querySelector('#data_clear');
+  const generateListButton = document.querySelector('#generate');
   const chartTarget = document.querySelector('#myChart');
   const loadAnimation = document.querySelector('#load_animation');
   loadAnimation.style.display = 'none';
   generateListButton.classList.add('hidden');
   const textField = document.querySelector('#breach');
   const sortDropdown = document.querySelector('#sort-breaches');
-
-  // const carto = initMap();
 
   const chartData = await getData();
   const shapedData = shapeDataForChart(chartData);
@@ -143,7 +140,6 @@ async function mainEvent() {
     loadAnimation.style.display = 'inline-block';
     // Basic GET request - this replaces the form Action
     const results = await fetch('https://haveibeenpwned.com/api/v3/breaches');
-
 
     const storedList = await results.json();
     const verifiedBreaches = storedList.filter(breach => breach.IsVerified);
