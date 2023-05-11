@@ -121,10 +121,6 @@ a {
   box-sizing: border-box;
 }
 
-/* 
-    These rules apply to actual HTML elements with no labelling!
-    So: they style the tags directly
-  */
 
 html {
   background-color: #0827c203;
@@ -159,7 +155,6 @@ form {
   accent-color: hsla(120, 89%, 48%, 0.482);
 }
 
-
 .box {
   background-color: rgba(239, 239, 239, 0.4);
   border: 2px dashed;
@@ -175,7 +170,6 @@ form {
 .visible {
   display: block;
 }
-
 
 form input {
   /* This is a hack to make sure our boxes line up with one another nicely */
@@ -195,7 +189,6 @@ form input {
   flex-direction: row;
   justify-content: space-evenly;
 }
-
 
 form label {
   width: 100%;
