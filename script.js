@@ -51,9 +51,9 @@ function sortDataForChart(data, sortOption) {
 
 function sortBreaches(list, sortOption) {
   let sortedList = [];
-  if (sortOption === "asc") {
+  if (sortOption === "desc") {
     sortedList = list.sort((a, b) => a.PwnCount - b.PwnCount);
-  } else if (sortOption === "desc") {
+  } else if (sortOption === "asc") {
     sortedList = list.sort((a, b) => b.PwnCount - a.PwnCount);
   } else if (sortOption === "oldest") {
     sortedList = list.sort((a, b) => new Date(a.BreachDate) - new Date(b.BreachDate));
@@ -125,8 +125,6 @@ function shapeDataForChart(array){
 
 }
 
-
-
 async function mainEvent() {
   // const loadDataButton = document.querySelector('#data_load'); 
   // const clearDataButton = document.querySelector('#data_clear');
@@ -146,8 +144,6 @@ async function mainEvent() {
   console.log(shapedData);
   const myChart = initChart(chartTarget, shapedData);
 
-
-
   const storedData = localStorage.getItem('storedData');
   let parsedData = JSON.parse(storedData);
   if (parsedData?.length > 0) {
@@ -159,14 +155,12 @@ async function mainEvent() {
   let selectedData;
 
   refreshButton.addEventListener('click', async (submitEvent) => { 
-
     submitEvent.preventDefault();
     // this is substituting for a "breakpoint" - it prints to the browser to tell us we successfully submitted the form
     console.log('loading data...');
     loadAnimation.style.display = 'inline-block';
     // Basic GET request - this replaces the form Action
     const results = await fetch('https://haveibeenpwned.com/api/v3/breaches');
-
     const storedList = await results.json();
     const verifiedBreaches = storedList.filter(breach => breach.IsVerified);
     storedList2 = verifiedBreaches;
@@ -180,10 +174,8 @@ async function mainEvent() {
     injectHTML(storedList2);
     const localData = shapeDataForChart(storedList2);
     changeChart(myChart, localData);
-
   });
 
-  
   generateListButton.addEventListener('click', (event) => {
     console.log('generate new list');
     currentList = RandomizeList(chartData);
@@ -193,7 +185,6 @@ async function mainEvent() {
     console.log(selectedData);
     changeChart(myChart, selectedData);
   });
-
   sortDropdown.addEventListener("change", (event) => {
     sortOption = event.target.value;
     // injectHTML(sortDataForChart(selectedData));
