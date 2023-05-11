@@ -102,10 +102,6 @@ a {
   flex-direction: column;
 }
 
-.breachlistbox{
-
- 
-}
 .footer {
   flex-shrink: 0;
   padding: 1rem;
@@ -382,7 +378,7 @@ form label {
 @media only screen and (max-width: 736px) {
   /* Rules in here will only apply when a screen is the correct size */
   /* check it out by using your developer tools to shrink your screen-size */
-  .container {
+  .wrapper {
     flex-direction: column;
     justify-content: center;
     align-items: center;
