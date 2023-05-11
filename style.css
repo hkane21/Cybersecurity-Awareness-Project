@@ -6,19 +6,17 @@
   flex: 1;
 }
 
-.header, h1{
+.header, h1 {
   display: flex;
   justify-content: center;
-  background-color: #f8f0f9;
+  background-color: #157ce8;
   color: rgb(0 0 0 / 80%);
   border-radius: 6px;
   border: 2px dashed;
   font-size: 1.5rem;
   padding: 1.25rem;
-  margin: 0; /* removing the margin on h1 tags means the header pins to the top if we move */
-  /* box-shadows are fancy */
-  box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%),
-    0 0 0 1px rgb(10 10 10 / 2%);
+  margin: 0;
+  box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%);
 }
 
 .header, .menu_box{
@@ -64,9 +62,7 @@ h2{
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-
   align-items: flex-start;
-
   flex: 1;
 }
 
@@ -90,8 +86,8 @@ a {
   text-decoration: none;
 }
 
-.breach_box, .breach_list{
-  background-color: hsl(0, 33%, 97%);
+.breach_box, .breach_list {
+  background-color: hsl(225.87deg 64.66% 87.74% / 97%);
   flex: 1 2 auto;
   margin: 1rem;
   border: 2px dashed;
@@ -106,7 +102,7 @@ a {
   flex-shrink: 0;
   padding: 1rem;
   border: 2px dashed;
-  background-color: #ededed;
+  background-color: #157ce8;
   font-size: 1.2rem;
   font-weight: 600;
 }
